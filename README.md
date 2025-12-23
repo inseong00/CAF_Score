@@ -76,7 +76,8 @@ python run_caf.py --audio_path /path/to/long_audio.wav --caption "Music playing"
     --clap_model laionclap --lalm_model audioflamingo3 --use_slide_window
 
 # Quiet mode (suppress progress messages)
-python run_caf.py --audio_path audio.wav --caption "A caption" --quiet
+python run_caf.py --audio_path audio.wav --caption "A caption" \
+    --clap_model mgaclap --lalm_model qwen3omni --use_slide_window --quiet
 ```
 
 **Output example:**
@@ -196,7 +197,8 @@ Where:
 | Model | Access |
 |-------|--------|
 | Audio-Flamingo-3 | [HuggingFace](https://huggingface.co/nvidia/audio-flamingo-3-hf) |
-| Qwen3-Omni | [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct) |
+| Qwen3-Omni-Instruct| [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct) |
+| Qwen3-Omni-Thinking| [HuggingFace](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Thinking) |
 
 ## BRACE Dataset
 
@@ -246,7 +248,6 @@ result = compute_caf_score(
     caption="A dog barking loudly",
     clap_model_name="laionclap",
     lalm_model_name="audioflamingo3",
-    alpha=0.5,
     verbose=True
 )
 
