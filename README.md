@@ -144,6 +144,15 @@ python eval_clap.py --clap_model mgaclap --dataset audiocaps_hallu \
 
 ### 2. LALM Evaluation (FLEUR)
 
+Before evaluation, you must download the Qwen3-Omni models locally and set the following environment variables:
+```bash
+# Set these to your local model directories
+export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
+export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
+```
+
+Replace `/path/to/` with the actual paths where you downloaded the models.
+
 Evaluate using Large Audio Language Models:
 
 ```bash
@@ -216,15 +225,6 @@ Supported subsets:
 - `clotho_hallu`: Clotho hallucination set
 
 ## Configuration
-
-### Environment Variables
-
-For Qwen3-Omni models, you can set custom model paths:
-
-```bash
-export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
-export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
-```
 
 ### GPU Configuration
 
