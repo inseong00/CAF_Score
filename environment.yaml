@@ -52,8 +52,12 @@ dependencies:
 
     # MGA-CLAP dependencies
     - ruamel.yaml>=0.18.0
-    - timm>=1.0.0
     - einops>=0.8.0
+    - wandb
+
+    # M2D-CLAP dependencies
+    - nnAudio>=0.3.0
+    - timm==0.9.16
 
     # Qwen3-Omni with vLLM
     - vllm>=0.6.0

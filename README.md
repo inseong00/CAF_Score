@@ -37,16 +37,17 @@ data/
 
 ```bash
 CAF_Score/
-├── run_caf.py            # Single audio-caption CAF-Score computation
-├── eval_caf.py           # Direct CAF-Score evaluation on BRACE dataset
-├── eval_clap.py          # CLAP model evaluation script
-├── eval_lalm.py          # LALM (FLEUR) evaluation script
-├── calc_caf.py           # CAF-Score calculation from pre-computed results
+├── run_caf.py                  # Single audio-caption CAF-Score computation
+├── eval_caf.py                 # Direct CAF-Score evaluation on BRACE dataset
+├── eval_clap.py                # CLAP model evaluation script
+├── eval_lalm.py                # LALM (FLEUR) evaluation script
+├── calc_caf.py                 # CAF-Score calculation from pre-computed results
 ├── src/
-│   ├── clap.py           # Unified CLAP model wrapper
-│   ├── af3_fleur.py      # Audio-Flamingo-3 FLEUR implementation
-│   ├── qwen3_fleur.py    # Qwen3-Omni FLEUR implementation
-│   └── models/           # Model implementations (MGA-CLAP, M2D-CLAP)
+│   ├── clap.py                 # Unified CLAP model wrapper
+│   ├── af3_fleur.py            # Audio-Flamingo-3 FLEUR implementation
+│   ├── qwen3_fleur.py          # Qwen3-Omni FLEUR implementation with vLLM
+│   ├── qwen3_fleur_single.py   # Qwen3-Omni FLEUR implementation without vLLM
+│   └── models/                 # Model implementations (MGA-CLAP, M2D-CLAP)
 ├── configs/
 │   └── mgaclap_config.yaml
 ├── data/
@@ -62,6 +63,15 @@ CAF_Score/
 
 ## Quick Start
 
+Before start, you must download the Qwen3-Omni models locally and set the following environment variables:
+```bash
+# Set these to your local model directories
+export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
+export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
+```
+
+Replace `/path/to/` with the actual paths where you downloaded the models.
+
 ### Single Audio-Caption CAF-Score
 
 Compute CAF-Score for a single audio file and caption:
@@ -74,10 +84,6 @@ python run_caf.py --audio_path /path/to/audio.wav --caption "A dog barking loudl
 # With sliding window for long audio
 python run_caf.py --audio_path /path/to/long_audio.wav --caption "Music playing" \
     --clap_model laionclap --lalm_model audioflamingo3 --use_slide_window
-
-# Quiet mode (suppress progress messages)
-python run_caf.py --audio_path audio.wav --caption "A caption" \
-    --clap_model mgaclap --lalm_model qwen3omni --use_slide_window --quiet
 ```
 
 **Output example:**
@@ -144,14 +150,7 @@ python eval_clap.py --clap_model mgaclap --dataset audiocaps_hallu \
 
 ### 2. LALM Evaluation (FLEUR)
 
-Before evaluation, you must download the Qwen3-Omni models locally and set the following environment variables:
-```bash
-# Set these to your local model directories
-export QWEN3_OMNI_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Instruct"
-export QWEN3_OMNI_THINKING_MODEL_PATH="/path/to/Qwen3-Omni-30B-A3B-Thinking"
-```
 
-Replace `/path/to/` with the actual paths where you downloaded the models.
 
 Evaluate using Large Audio Language Models:
 
@@ -248,7 +247,6 @@ result = compute_caf_score(
     caption="A dog barking loudly",
     clap_model_name="laionclap",
     lalm_model_name="audioflamingo3",
-    verbose=True
 )
 
 print(f"CLAP Score: {result['clap_score']:.4f}")

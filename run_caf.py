@@ -22,9 +22,6 @@ def compute_caf_score(
     use_slide_window: bool = False,
     pooling: str = 'max',
     use_think_mode: bool = False,
-    tensor_parallel_size: int = 2,
-    gpu_memory_utilization: float = 0.95,
-    verbose: bool = True
 ) -> dict:
     """
     Compute CAF-Score for a single audio-caption pair.
@@ -38,9 +35,6 @@ def compute_caf_score(
         use_slide_window: Use sliding window for long audio in CLAP
         pooling: Pooling method for sliding window ('max' or 'mean')
         use_think_mode: Use thinking mode for LALM
-        tensor_parallel_size: Tensor parallel size for Qwen3-Omni
-        gpu_memory_utilization: GPU memory utilization for Qwen3-Omni
-        verbose: Print progress information
 
     Returns:
         Dictionary containing:
@@ -53,13 +47,9 @@ def compute_caf_score(
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
     # Load CLAP model
-    if verbose:
-        print(f"Loading CLAP model: {clap_model_name}")
     clap_model = load_clap(clap_model_name)
 
     # Compute CLAP similarity
-    if verbose:
-        print("Computing CLAP similarity...")
     clap_similarity = clap_model.get_similarity(
         audio_path,
         caption,
@@ -73,26 +63,16 @@ def compute_caf_score(
         pass
     args = Args()
     args.use_think_mode = use_think_mode
-    args.tensor_parallel_size = tensor_parallel_size
-    args.gpu_memory_utilization = gpu_memory_utilization
-
-    # Load LALM model and compute FLEUR score
-    if verbose:
-        print(f"Loading LALM model: {lalm_model_name}")
 
     if lalm_model_name == 'qwen3omni':
-        from src.qwen3_fleur import load_model, get_fleur
-        llm, processor, tokenizer, sampling_params, rate2token = load_model(args)
-        if verbose:
-            print("Computing FLEUR score...")
+        from src.qwen3_fleur_single import load_model, get_fleur
+        model, processor, rate2token = load_model(args)
         raw_fleur_score, fleur_score = get_fleur(
-            llm, processor, tokenizer, sampling_params, rate2token, caption, audio_path
+            model, processor, rate2token, caption, audio_path
         )
     elif lalm_model_name == 'audioflamingo3':
         from src.af3_fleur import load_model, get_fleur
         model, processor, rate2token = load_model(args)
-        if verbose:
-            print("Computing FLEUR score...")
         raw_fleur_score, fleur_score = get_fleur(
             model, processor, rate2token, caption, audio_path
         )
@@ -190,24 +170,6 @@ Examples:
         default=False,
         help='Use thinking mode for LALM'
     )
-    parser.add_argument(
-        '--tensor_parallel_size',
-        type=int,
-        default=2,
-        help='Tensor parallel size for Qwen3-Omni (default: 2)'
-    )
-    parser.add_argument(
-        '--gpu_memory_utilization',
-        type=float,
-        default=0.95,
-        help='GPU memory utilization for Qwen3-Omni (default: 0.95)'
-    )
-    parser.add_argument(
-        '--quiet',
-        action='store_true',
-        default=False,
-        help='Suppress progress messages'
-    )
 
     args = parser.parse_args()
 
@@ -221,9 +183,6 @@ Examples:
         use_slide_window=args.use_slide_window,
         pooling=args.pooling,
         use_think_mode=args.use_think_mode,
-        tensor_parallel_size=args.tensor_parallel_size,
-        gpu_memory_utilization=args.gpu_memory_utilization,
-        verbose=not args.quiet
     )
 
     # Print results
